@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+
+<html lang="pl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta name="theme-color" content="#101827">
+
+<title>WYCEŃ-TO</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{margin:0;padding:18px;background:#101827;color:white;font-family:Arial}
+
+h1{color:#69a9ff}
+
+.card{background:#1c293c;padding:16px;border-radius:14px;margin:15px 0}
+
+h2{font-size:19px;color:#8dbaff}
+
+label{display:block;margin-top:12px;font-size:14px;color:#ccd6e5}
+
+input,select{width:100%;padding:13px;margin-top:5px;border:1px solid #52627a;border-radius:8px;background:#101827;color:white;font-size:16px}
+
+button{width:100%;padding:14px;margin-top:14px;border:0;border-radius:9px;background:#2879e8;color:white;font-size:16px;font-weight:bold}
+
+.result{font-size:32px;color:#72e6a2;font-weight:bold}
+
+.line{display:flex;justify-content:space-between;margin:12px 0}
+
+small{color:#aab7c9}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>WYCEŃ-TO</h1>
+
+<p>Kalkulator wyceny wydruków 3D</p>
+
+<div class="card">
+
+<h2>Materiał</h2>
+
+<label>Nazwa materiału</label>
+
+<input id="material" value="PLA">
+
+<label>Masa wydruku (g)</label>
+
+<input id="grams" type="number" value="100">
+
+<label>Cena filamentu za kilogram (zł)</label>
+
+<input id="filament" type="number" value="80">
+
+<label>Straty materiału (%)</label>
+
+<input id="waste" type="number" value="10">
+
+</div>
+
+<div class="card">
+
+<h2>Drukarka</h2>
+
+<label>Nazwa drukarki</label>
+
+<input id="printer" value="Moja drukarka">
+
+<label>Czas druku (godziny)</label>
+
+<input id="hours" type="number" value="5" step="0.1">
+
+<label>Moc drukarki (W)</label>
+
+<input id="watts" type="number" value="150">
+
+<label>Cena prądu (zł/kWh)</label>
+
+<input id="energy" type="number" value="1.20" step="0.01">
+
+<label>Amortyzacja za godzinę (zł)</label>
+
+<input id="depreciation" type="number" value="1">
+
+</div>
+
+<div class="card">
+
+<h2>Dodatkowe koszty</h2>
+
+<label>Twoja praca (zł)</label>
+
+<input id="labor" type="number" value="5">
+
+<label>Inne koszty (zł)</label>
+
+<input id="extra" type="number" value="0">
+
+</div>
+
+<div class="card">
+
+<h2>Sprzedaż</h2>
+
+<label>Platforma</label>
+
+<select id="platform">
+
+<option>Sprzedaż własna</option>
+
+<option>Allegro</option>
+
+<option>OLX</option>
+
+<option>Etsy</option>
+
+<option>Inna</option>
+
+</select>
+
+<label>Prowizja platformy (%)</label>
+
+<input id="fee" type="number" value="0" step="0.1">
+
+<label>Opłata stała (zł)</label>
+
+<input id="fixed" type="number" value="0" step="0.01">
+
+<label>Docelowa marża (%)</label>
+
+<input id="margin" type="number" value="30" step="0.1">
+
+<small>Marża liczona od ceny sprzedaży.</small>
+
+</div>
+
+<div class="card">
+
+<h2>Wynik wyceny</h2>
+
+<p>Sugerowana cena:</p>
+
+<div class="result" id="price">0,00 zł</div>
+
+<div class="line"><span>Materiał</span><b id="rmat">0 zł</b></div>
+
+<div class="line"><span>Prąd</span><b id="rpower">0 zł</b></div>
+
+<div class="line"><span>Amortyzacja</span><b id="rdep">0 zł</b></div>
+
+<div class="line"><span>Praca i dodatki</span><b id="rlabor">0 zł</b></div>
+
+<div class="line"><span>Opłata platformy</span><b id="rfee">0 zł</b></div>
+
+<div class="line"><span>Całkowity koszt</span><b id="rcost">0 zł</b></div>
+
+<div class="line"><span>Zysk</span><b id="profit">0 zł</b></div>
+
+<button onclick="save()">Zapisz wycenę</button>
+
+</div>
+
+<div class="card">
+
+<h2>Historia wycen</h2>
+
+<div id="history">Brak zapisanych wycen.</div>
+
+<button onclick="exportData()">Eksportuj historię</button>
+
+</div>
+
+<script>
+
+const ids=['material','grams','filament','waste','printer','hours','watts','energy','depreciation','labor','extra','platform','fee','fixed','margin'];
+
+const get=id=>document.getElementById(id);
+
+const n=id=>Number(get(id).value)||0;
+
+const fmt=x=>x.toLocaleString('pl-PL',{style:'currency',currency:'PLN'});
+
+let last={};
+
+function calculate(){
+
+ const mat=n('grams')/1000*n('filament')*(1+n('waste')/100);
+
+ const power=n('hours')*n('watts')/1000*n('energy');
+
+ const dep=n('hours')*n('depreciation');
+
+ const labor=n('labor')+n('extra');
+
+ const cost=mat+power+dep+labor;
+
+ const fee=n('fee')/100;
+
+ const fixed=n('fixed');
+
+ const margin=n('margin')/100;
+
+ const denominator=1-fee-margin;
+
+ if(ids.some(id=>get(id).value.trim()==='') ||
+
+ n('grams')<0 || n('filament')<0 || n('waste')<0 ||
+
+ n('hours')<0 || n('watts')<0 || n('energy')<0 ||
+
+ n('depreciation')<0 || n('labor')<0 || n('extra')<0 ||
+
+ n('fee')<0 || n('fixed')<0 || n('margin')<0 ||
+
+ fee+margin>=1){
+
+ get('price').textContent='Sprawdź dane';
+
+ return;
+
+ }
+
+ const price=(cost+fixed)/denominator;
+
+ const feeAmount=price*fee+fixed;
+
+ const profit=price-cost-feeAmount;
+
+ last={price,cost,profit,mat,power,dep,labor,feeAmount};
+
+ get('price').textContent=fmt(price);
+
+ get('rmat').textContent=fmt(mat);
+
+ get('rpower').textContent=fmt(power);
+
+ get('rdep').textContent=fmt(dep);
+
+ get('rlabor').textContent=fmt(labor);
+
+ get('rfee').textContent=fmt(feeAmount);
+
+ get('rcost').textContent=fmt(cost+feeAmount);
+
+ get('profit').textContent=fmt(profit);
+
+}
+
+function save(){
+
+ const item={
+
+ date:new Date().toLocaleString('pl-PL'),
+
+ material:get('material').value,
+
+ printer:get('printer').value,
+
+ price:last.price||0
+
+ };
+
+ let history=JSON.parse(localStorage.getItem('wycento')||'[]');
+
+ history.unshift(item);
+
+ localStorage.setItem('wycento',JSON.stringify(history));
+
+ showHistory();
+
+}
+
+function showHistory(){
+
+ const history=JSON.parse(localStorage.getItem('wycento')||'[]');
+
+ get('history').innerHTML=history.length
+
+ ?history.map(x=>'<p>'+x.date+' — '+x.material+' — '+fmt(x.price)+'</p>').join('')
+
+ :'Brak zapisanych wycen.';
+
+}
+
+function exportData(){
+
+ const data=localStorage.getItem('wycento')||'[]';
+
+ const blob=new Blob([data],{type:'application/json'});
+
+ const a=document.createElement('a');
+
+ a.href=URL.createObjectURL(blob);
+
+ a.download='historia-wycen.json';
+
+ a.click();
+
+ URL.revokeObjectURL(a.href);
+
+}
+
+ids.forEach(id=>get(id).addEventListener('input',calculate));
+
+showHistory();
+
+calculate();
+
+</script>
+
+</body>
+
+</html>
