@@ -1,325 +1,61 @@
-
-
-<!DOCTYPE html>
-
-<html lang="pl">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<meta name="theme-color" content="#101827">
-
-<title>WYCEŃ-TO</title>
-
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101827"><title>WYCEŃ-TO 2.0</title>
 <style>
-
-*{box-sizing:border-box}
-
-body{margin:0;padding:18px;background:#101827;color:white;font-family:Arial}
-
-h1{color:#69a9ff}
-
-.card{background:#1c293c;padding:16px;border-radius:14px;margin:15px 0}
-
-h2{font-size:19px;color:#8dbaff}
-
-label{display:block;margin-top:12px;font-size:14px;color:#ccd6e5}
-
-input,select{width:100%;padding:13px;margin-top:5px;border:1px solid #52627a;border-radius:8px;background:#101827;color:white;font-size:16px}
-
-button{width:100%;padding:14px;margin-top:14px;border:0;border-radius:9px;background:#2879e8;color:white;font-size:16px;font-weight:bold}
-
-.result{font-size:32px;color:#72e6a2;font-weight:bold}
-
-.line{display:flex;justify-content:space-between;margin:12px 0}
-
-small{color:#aab7c9}
-
-</style>
-
-</head>
-
-<body>
-
-<h1>WYCEŃ-TO</h1>
-
-<p>Kalkulator wyceny wydruków 3D</p>
-
-<div class="card">
-
-<h2>Materiał</h2>
-
-<label>Nazwa materiału</label>
-
-<input id="material" value="PLA">
-
-<label>Masa wydruku (g)</label>
-
-<input id="grams" type="number" value="100">
-
-<label>Cena filamentu za kilogram (zł)</label>
-
-<input id="filament" type="number" value="80">
-
-<label>Straty materiału (%)</label>
-
-<input id="waste" type="number" value="10">
-
-</div>
-
-<div class="card">
-
-<h2>Drukarka</h2>
-
-<label>Nazwa drukarki</label>
-
-<input id="printer" value="Moja drukarka">
-
-<label>Czas druku (godziny)</label>
-
-<input id="hours" type="number" value="5" step="0.1">
-
-<label>Moc drukarki (W)</label>
-
-<input id="watts" type="number" value="150">
-
-<label>Cena prądu (zł/kWh)</label>
-
-<input id="energy" type="number" value="1.20" step="0.01">
-
-<label>Amortyzacja za godzinę (zł)</label>
-
-<input id="depreciation" type="number" value="1">
-
-</div>
-
-<div class="card">
-
-<h2>Dodatkowe koszty</h2>
-
-<label>Twoja praca (zł)</label>
-
-<input id="labor" type="number" value="5">
-
-<label>Inne koszty (zł)</label>
-
-<input id="extra" type="number" value="0">
-
-</div>
-
-<div class="card">
-
-<h2>Sprzedaż</h2>
-
-<label>Platforma</label>
-
-<select id="platform">
-
-<option>Sprzedaż własna</option>
-
-<option>Allegro</option>
-
-<option>OLX</option>
-
-<option>Etsy</option>
-
-<option>Inna</option>
-
-</select>
-
-<label>Prowizja platformy (%)</label>
-
-<input id="fee" type="number" value="0" step="0.1">
-
-<label>Opłata stała (zł)</label>
-
-<input id="fixed" type="number" value="0" step="0.01">
-
-<label>Docelowa marża (%)</label>
-
-<input id="margin" type="number" value="30" step="0.1">
-
-<small>Marża liczona od ceny sprzedaży.</small>
-
-</div>
-
-<div class="card">
-
-<h2>Wynik wyceny</h2>
-
-<p>Sugerowana cena:</p>
-
-<div class="result" id="price">0,00 zł</div>
-
-<div class="line"><span>Materiał</span><b id="rmat">0 zł</b></div>
-
-<div class="line"><span>Prąd</span><b id="rpower">0 zł</b></div>
-
-<div class="line"><span>Amortyzacja</span><b id="rdep">0 zł</b></div>
-
-<div class="line"><span>Praca i dodatki</span><b id="rlabor">0 zł</b></div>
-
-<div class="line"><span>Opłata platformy</span><b id="rfee">0 zł</b></div>
-
-<div class="line"><span>Całkowity koszt</span><b id="rcost">0 zł</b></div>
-
-<div class="line"><span>Zysk</span><b id="profit">0 zł</b></div>
-
-<button onclick="save()">Zapisz wycenę</button>
-
-</div>
-
-<div class="card">
-
-<h2>Historia wycen</h2>
-
-<div id="history">Brak zapisanych wycen.</div>
-
-<button onclick="exportData()">Eksportuj historię</button>
-
-</div>
-
+:root{color-scheme:dark;--bg:#101827;--card:#1c293c;--fg:#f4f7fc;--muted:#afbdd0;--line:#45536a;--blue:#80b5ff;--button:#2879e8;--good:#76e5a6;--bad:#ff9696}body.light{color-scheme:light;--bg:#f3f6fb;--card:#fff;--fg:#142238;--muted:#53647a;--line:#c7d2df;--blue:#1457a6;--button:#1469d5;--good:#116d40;--bad:#ad2222}*{box-sizing:border-box}body{margin:0;padding:16px 16px 50px;background:var(--bg);color:var(--fg);font:16px -apple-system,BlinkMacSystemFont,Arial,sans-serif;max-width:780px;margin-inline:auto}h1{margin:8px 0 4px;color:var(--blue)}h2{font-size:19px;margin:0 0 14px;color:var(--blue)}p{line-height:1.4}.muted,small{color:var(--muted)}.card{background:var(--card);padding:17px;border-radius:17px;margin:15px 0;border:1px solid var(--line)}.tabs{display:flex;gap:6px;overflow:auto;padding:4px 0}.tabs button{width:auto;white-space:nowrap;margin:0;padding:11px 12px}.tabs button.active{background:var(--good);color:var(--bg)}label{display:block;margin:13px 0 5px;color:var(--muted);font-size:14px}input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg);font-size:16px}button{padding:12px 14px;border:0;border-radius:9px;background:var(--button);color:white;font-weight:700;font-size:15px;margin-top:12px;cursor:pointer}button.secondary{background:transparent;color:var(--fg);border:1px solid var(--line)}button.danger{background:#9b3131}button:disabled{opacity:.45}.row{display:flex;gap:10px;align-items:center}.row>*{flex:1;min-width:0}.between{display:flex;justify-content:space-between;gap:12px;margin:10px 0}.price{font-size:34px;color:var(--good);font-weight:800}.bad{color:var(--bad)}.good{color:var(--good)}.hidden{display:none!important}.entry{padding:13px 0;border-bottom:1px solid var(--line)}.entry:last-child{border:0}.entry button{margin-right:6px}.tag{font-size:12px;border:1px solid var(--line);border-radius:20px;padding:4px 8px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.top button{margin:0}.note{font-size:13px;color:var(--muted)}.error{color:var(--bad);font-weight:700}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:390px){.grid{grid-template-columns:1fr}}@media print{.tabs,button,.no-print{display:none!important}body{background:white;color:black}.card{border:1px solid #ccc;background:white;color:black}.price{color:black}}
+</style></head><body>
+<header class="top"><div><h1>WYCEŃ-TO</h1><small>Wyceny wydruków 3D · PLN · wersja 2.0</small></div><button id="theme" class="secondary" type="button">☀️ / 🌙</button></header>
+<nav class="tabs no-print"><button data-tab="calc" class="active">Kalkulator</button><button data-tab="history">Historia</button><button data-tab="settings">Ustawienia</button></nav>
+<main id="calc">
+<section class="card"><h2>Projekt</h2><label for="name">Nazwa projektu</label><input id="name" value="Nowy wydruk" maxlength="120"><label for="notes">Notatki (opcjonalnie)</label><textarea id="notes" rows="2" placeholder="Opis dla siebie"></textarea></section>
+<section class="card"><h2>Materiał</h2><label for="material">Wybierz materiał</label><select id="material"></select><div class="grid"><div><label for="grams">Masa wydruku (g)</label><input id="grams" type="number" min="0" step="0.1" value="100"></div><div><label for="waste">Odpad (%)</label><input id="waste" type="number" min="0" step="0.1" value="10"></div></div><label for="filament">Cena materiału za 1 kg (zł)</label><input id="filament" type="number" min="0" step="0.01" value="80"></section>
+<section class="card"><h2>Drukarka i czas</h2><label for="printer">Wybierz drukarkę</label><select id="printer"></select><div class="grid"><div><label for="hours">Czas druku (h)</label><input id="hours" type="number" min="0" step="0.1" value="5"></div><div><label for="watts">Moc drukarki (W)</label><input id="watts" type="number" min="0" step="1" value="150"></div><div><label for="energy">Prąd (zł/kWh)</label><input id="energy" type="number" min="0" step="0.01" value="1.20"></div><div><label for="depreciation">Amortyzacja (zł/h)</label><input id="depreciation" type="number" min="0" step="0.01" value="1"></div></div></section>
+<section class="card"><h2>Praca, opakowanie i wysyłka</h2><div class="grid"><div><label for="labor">Praca (zł)</label><input id="labor" type="number" min="0" step="0.01" value="5"></div><div><label for="extra">Inne koszty (zł)</label><input id="extra" type="number" min="0" step="0.01" value="0"></div><div><label for="pack">Opakowanie (zł)</label><input id="pack" type="number" min="0" step="0.01" value="2"></div><div><label for="shipping">Wysyłka (zł)</label><input id="shipping" type="number" min="0" step="0.01" value="0"></div></div><label for="shippingPaid">Kto płaci za wysyłkę?</label><select id="shippingPaid"><option value="seller">Sprzedawca – wlicz do ceny</option><option value="buyer">Klient – dolicz osobno do zapłaty</option></select></section>
+<section class="card"><h2>Sprzedaż i rabat</h2><label for="platform">Platforma</label><select id="platform"></select><div class="grid"><div><label for="fee">Prowizja od ceny produktu (%)</label><input id="fee" type="number" min="0" step="0.01" value="0"></div><div><label for="fixed">Opłata stała (zł)</label><input id="fixed" type="number" min="0" step="0.01" value="0"></div><div><label for="margin">Docelowa marża (%)</label><input id="margin" type="number" min="0" step="0.1" value="30"></div><div><label for="discount">Rabat od ceny produktu (%)</label><input id="discount" type="number" min="0" max="100" step="0.1" value="0"></div></div><p class="note">Prowizję i opłatę wpisz według aktualnych zasad platformy. Kalkulator zakłada prowizję od ceny produktu po rabacie, bez kosztu dostawy. Marża oznacza zysk jako procent ceny produktu.</p></section>
+<section class="card"><h2>Wynik wyceny</h2><p class="muted">Cena produktu przed rabatem</p><div id="price" class="price">—</div><div id="error" class="error" role="alert"></div><div class="between"><span>Po rabacie</span><b id="after">—</b></div><div class="between"><span>Łącznie klient płaci</span><b id="customer">—</b></div><hr><div class="between"><span>Materiał</span><b id="rmat">—</b></div><div class="between"><span>Prąd</span><b id="rpower">—</b></div><div class="between"><span>Amortyzacja</span><b id="rdep">—</b></div><div class="between"><span>Praca i dodatki</span><b id="rlabor">—</b></div><div class="between"><span>Opakowanie i wysyłka</span><b id="rpack">—</b></div><div class="between"><span>Prowizje i opłaty</span><b id="rfee">—</b></div><div class="between"><span>Łączne koszty</span><b id="rcost">—</b></div><div class="between"><span>Zysk po rabacie</span><b id="profit">—</b></div><div class="between"><span>Rzeczywista marża</span><b id="actualMargin">—</b></div><div class="between"><span>Minimalna cena produktu (bez straty)</span><b id="minimum">—</b></div><div class="between"><span>Maksymalny rabat bez straty</span><b id="maxDiscount">—</b></div><p class="note">Ceny zaokrąglane w górę do 1 grosza. Minimalna cena oznacza próg zerowego zysku, nie uwzględnia podatków ani zwrotów.</p><button id="save">Zapisz wycenę</button> <button id="print" class="secondary">Drukuj / PDF</button></section>
+</main>
+<section id="history" class="card hidden"><h2>Historia wycen</h2><input id="search" placeholder="Szukaj nazwy, materiału lub drukarki"><div id="historyList"></div><button id="export">Eksportuj kopię JSON</button><label for="import">Przywróć kopię JSON</label><input id="import" type="file" accept="application/json,.json"><p class="note">Dane zapisują się tylko w tej przeglądarce. Regularnie eksportuj kopię. Nie czyść danych Safari bez kopii.</p></section>
+<section id="settings" class="hidden"><div class="card"><h2>Materiały</h2><p class="note">Ceny przykładowe – ustaw swoje rzeczywiste koszty.</p><div id="materialsList"></div><label>Nazwa nowego materiału</label><input id="newMaterial" placeholder="np. PLA Silk"><label>Cena za kg (zł)</label><input id="newMaterialPrice" type="number" min="0" step="0.01" value="80"><button id="addMaterial">Dodaj materiał</button></div><div class="card"><h2>Drukarki</h2><div id="printersList"></div><label>Nazwa drukarki</label><input id="newPrinter" placeholder="np. Bambu Lab A1"><div class="grid"><div><label>Moc (W)</label><input id="newWatts" type="number" min="0" value="150"></div><div><label>Amortyzacja (zł/h)</label><input id="newDep" type="number" min="0" step="0.01" value="1"></div></div><button id="addPrinter">Dodaj drukarkę</button></div><div class="card"><h2>Platformy</h2><p class="note">Stawki nie są aktualizowane automatycznie. Wpisz opłaty w PLN, zgodnie z regulaminem danej platformy.</p><div id="platformsList"></div><label>Nazwa platformy</label><input id="newPlatform" placeholder="np. Sklep internetowy"><div class="grid"><div><label>Prowizja (%)</label><input id="newFee" type="number" min="0" step="0.01" value="0"></div><div><label>Opłata stała (zł)</label><input id="newFixed" type="number" min="0" step="0.01" value="0"></div></div><button id="addPlatform">Dodaj platformę</button></div></section>
 <script>
-
-const ids=['material','grams','filament','waste','printer','hours','watts','energy','depreciation','labor','extra','platform','fee','fixed','margin'];
-
-const get=id=>document.getElementById(id);
-
-const n=id=>Number(get(id).value)||0;
-
-const fmt=x=>x.toLocaleString('pl-PL',{style:'currency',currency:'PLN'});
-
-let last={};
-
-function calculate(){
-
- const mat=n('grams')/1000*n('filament')*(1+n('waste')/100);
-
- const power=n('hours')*n('watts')/1000*n('energy');
-
- const dep=n('hours')*n('depreciation');
-
- const labor=n('labor')+n('extra');
-
- const cost=mat+power+dep+labor;
-
- const fee=n('fee')/100;
-
- const fixed=n('fixed');
-
- const margin=n('margin')/100;
-
- const denominator=1-fee-margin;
-
- if(ids.some(id=>get(id).value.trim()==='') ||
-
- n('grams')<0 || n('filament')<0 || n('waste')<0 ||
-
- n('hours')<0 || n('watts')<0 || n('energy')<0 ||
-
- n('depreciation')<0 || n('labor')<0 || n('extra')<0 ||
-
- n('fee')<0 || n('fixed')<0 || n('margin')<0 ||
-
- fee+margin>=1){
-
- get('price').textContent='Sprawdź dane';
-
- return;
-
- }
-
- const price=(cost+fixed)/denominator;
-
- const feeAmount=price*fee+fixed;
-
- const profit=price-cost-feeAmount;
-
- last={price,cost,profit,mat,power,dep,labor,feeAmount};
-
- get('price').textContent=fmt(price);
-
- get('rmat').textContent=fmt(mat);
-
- get('rpower').textContent=fmt(power);
-
- get('rdep').textContent=fmt(dep);
-
- get('rlabor').textContent=fmt(labor);
-
- get('rfee').textContent=fmt(feeAmount);
-
- get('rcost').textContent=fmt(cost+feeAmount);
-
- get('profit').textContent=fmt(profit);
-
-}
-
-function save(){
-
- const item={
-
- date:new Date().toLocaleString('pl-PL'),
-
- material:get('material').value,
-
- printer:get('printer').value,
-
- price:last.price||0
-
- };
-
- let history=JSON.parse(localStorage.getItem('wycento')||'[]');
-
- history.unshift(item);
-
- localStorage.setItem('wycento',JSON.stringify(history));
-
- showHistory();
-
-}
-
-function showHistory(){
-
- const history=JSON.parse(localStorage.getItem('wycento')||'[]');
-
- get('history').innerHTML=history.length
-
- ?history.map(x=>'<p>'+x.date+' — '+x.material+' — '+fmt(x.price)+'</p>').join('')
-
- :'Brak zapisanych wycen.';
-
-}
-
-function exportData(){
-
- const data=localStorage.getItem('wycento')||'[]';
-
- const blob=new Blob([data],{type:'application/json'});
-
- const a=document.createElement('a');
-
- a.href=URL.createObjectURL(blob);
-
- a.download='historia-wycen.json';
-
- a.click();
-
- URL.revokeObjectURL(a.href);
-
-}
-
-ids.forEach(id=>get(id).addEventListener('input',calculate));
-
-showHistory();
-
-calculate();
-
-</script>
-
-</body>
-
-</html>
+'use strict';
+const $=id=>document.getElementById(id),money=x=>Number.isFinite(x)?x.toLocaleString('pl-PL',{style:'currency',currency:'PLN'}):'—',pct=x=>x.toLocaleString('pl-PL',{maximumFractionDigits:2})+'%';
+const defaults={materials:[{name:'PLA',price:80},{name:'PLA+',price:90},{name:'PETG',price:85},{name:'ABS',price:95},{name:'ASA',price:110},{name:'TPU',price:130},{name:'PA (Nylon)',price:160},{name:'PC',price:170}],printers:[{name:'Moja drukarka',watts:150,dep:1}],platforms:[{name:'Sprzedaż własna',fee:0,fixed:0},{name:'Allegro',fee:0,fixed:0},{name:'OLX',fee:0,fixed:0},{name:'Etsy',fee:0,fixed:0},{name:'Inna',fee:0,fixed:0}],history:[]};
+function read(){try{let a=JSON.parse(localStorage.getItem('wycento-v2')||'{}');return Object.fromEntries(Object.entries(defaults).map(([k,v])=>[k,Array.isArray(a[k])?a[k]:structuredClone(v)]))}catch{return structuredClone(defaults)}}let db=read(),last=null,editing=null;
+function persist(){try{localStorage.setItem('wycento-v2',JSON.stringify(db));return true}catch{alert('Nie udało się zapisać. Sprawdź miejsce i ustawienia Safari.');return false}}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function options(id,arr){const previous=$(id).value;$(id).innerHTML=arr.map((v,i)=>'<option value="'+i+'">'+escapeHTML(v.name)+'</option>').join('');if(previous!==''&&Number(previous)<arr.length)$(id).value=previous}
+function refreshLists(){options('material',db.materials);options('printer',db.printers);options('platform',db.platforms);for(const [key,target,format] of [['materials','materialsList',v=>money(v.price)+'/kg'],['printers','printersList',v=>v.watts+' W · '+money(v.dep)+'/h'],['platforms','platformsList',v=>v.fee+'% + '+money(v.fixed)]]){$(target).innerHTML=db[key].map((v,i)=>'<div class="entry"><b>'+escapeHTML(v.name)+'</b> <small>'+escapeHTML(format(v))+'</small> <button class="secondary" data-del="'+key+'" data-index="'+i+'">Usuń</button></div>').join('')}}
+function fillMaterial(){$('filament').value=db.materials[Number($('material').value)]?.price??0;calculate()}
+function fillPrinter(){const p=db.printers[Number($('printer').value)];if(p){$('watts').value=p.watts;$('depreciation').value=p.dep}calculate()}
+function fillPlatform(){const p=db.platforms[Number($('platform').value)];if(p){$('fee').value=p.fee;$('fixed').value=p.fixed}calculate()}
+const fields=['grams','filament','waste','hours','watts','energy','depreciation','labor','extra','pack','shipping','fee','fixed','margin','discount'];
+function calculate(){const val={};for(const id of fields){const raw=$(id).value.trim().replace(',','.');const v=Number(raw);if(!raw||!Number.isFinite(v)||v<0){showError('Wpisz poprawną nieujemną liczbę w polu: '+id);return}val[id]=v}const v=val;if(v.fee>=100||v.margin>=100||v.discount>=100||v.fee+v.margin>=100){showError('Prowizja + marża muszą być poniżej 100%, a rabat poniżej 100%.');return}
+const mat=v.grams/1000*v.filament*(1+v.waste/100),power=v.hours*v.watts/1000*v.energy,dep=v.hours*v.depreciation,work=v.labor+v.extra,pack=v.pack+v.shipping;
+const cost=mat+power+dep+work+pack,shippingBuyer=$('shippingPaid').value==='buyer'?v.shipping:0;
+// When buyer pays shipping, it reimburses the seller's shipping cost separately; platform fee applies to product only.
+const productCost=cost-shippingBuyer,fee=v.fee/100,margin=v.margin/100,discount=v.discount/100;
+const minimum=Math.ceil((productCost+v.fixed)/(1-fee)*100-1e-9)/100;
+const targetAfter=(productCost+v.fixed)/(1-fee-margin);
+const price=Math.ceil(targetAfter/(1-discount)*100-1e-9)/100;
+const after=Math.round(price*(1-discount)*100)/100,commission=Math.round((after*fee+v.fixed)*100)/100;
+const profit=Math.round((after-productCost-commission)*100)/100;
+const customer=after+shippingBuyer,actual=after>0?profit/after*100:0;
+const maxDiscount=price>0?Math.max(0,(1-minimum/price)*100):0;
+last={price,after,customer,profit,cost:productCost+commission+shippingBuyer,mat,power,dep,work,pack,commission,minimum,maxDiscount,actual,values:Object.fromEntries([...fields,'name','notes','shippingPaid'].map(k=>[k,$(k).value])),material:db.materials[Number($('material').value)]?.name||'',printer:db.printers[Number($('printer').value)]?.name||'',platform:db.platforms[Number($('platform').value)]?.name||''};
+$('error').textContent='';for(const [id,x] of Object.entries({price,after,customer,rmat:mat,rpower:power,rdep:dep,rlabor:work,rpack:pack,rfee:commission,rcost:last.cost,profit,minimum}))$(id).textContent=money(x);
+$('actualMargin').textContent=pct(actual);$('maxDiscount').textContent=pct(maxDiscount);$('profit').className=profit<0?'bad':'good';$('save').disabled=false}
+function showError(s){last=null;$('error').textContent=s;$('price').textContent='—';for(const id of ['after','customer','rmat','rpower','rdep','rlabor','rpack','rfee','rcost','profit','minimum','actualMargin','maxDiscount'])$(id).textContent='—';$('save').disabled=true}
+function showTab(id){for(const x of ['calc','history','settings'])$(x).classList.toggle('hidden',x!==id);document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id==='history')renderHistory();if(id==='settings')refreshLists()}
+function renderHistory(){const q=$('search').value.toLowerCase();const items=db.history.filter(x=>(x.name+' '+x.material+' '+x.printer).toLowerCase().includes(q));$('historyList').innerHTML=items.length?items.map(x=>'<div class="entry"><b>'+escapeHTML(x.name)+'</b> <span class="tag">'+escapeHTML(x.date)+'</span><p class="muted">'+escapeHTML(x.material)+' · '+escapeHTML(x.printer)+' · '+escapeHTML(x.platform)+'</p><div class="between"><span>Cena po rabacie</span><b>'+money(x.after)+'</b></div><div class="between"><span>Zysk</span><b>'+money(x.profit)+'</b></div><button data-load="'+escapeHTML(x.id)+'">Wczytaj</button><button class="danger" data-remove="'+escapeHTML(x.id)+'">Usuń</button></div>').join(''):'Brak pasujących wycen.'}
+$('save').onclick=()=>{if(!last)return;const item={...last,id:editing||String(Date.now())+'-'+Math.random().toString(36).slice(2),name:$('name').value.trim()||'Bez nazwy',date:new Date().toLocaleString('pl-PL')};db.history=db.history.filter(x=>x.id!==item.id);db.history.unshift(item);if(persist()){editing=item.id;alert('Wycena zapisana w historii.')}};
+$('historyList').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.remove){if(confirm('Usunąć tę wycenę?')){db.history=db.history.filter(x=>x.id!==b.dataset.remove);persist();renderHistory()}return}const x=db.history.find(v=>v.id===b.dataset.load);if(!x)return;for(const [id,value] of Object.entries(x.values||{}))if($(id))$(id).value=value;for(const [field,collection,name] of [['material','materials',x.material],['printer','printers',x.printer],['platform','platforms',x.platform]]){let i=db[collection].findIndex(v=>v.name===name);if(i>=0)$(field).value=String(i)}editing=x.id;calculate();showTab('calc');window.scrollTo(0,0)};
+$('search').oninput=renderHistory;
+$('export').onclick=()=>{const blob=new Blob([JSON.stringify({app:'WYCEŃ-TO',version:2,exported:new Date().toISOString(),data:db},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wycen-to-kopia-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$('import').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const obj=JSON.parse(await file.text());if(obj.app!=='WYCEŃ-TO'||obj.version!==2||!obj.data||!['materials','printers','platforms','history'].every(k=>Array.isArray(obj.data[k]))||!obj.data.materials.length||!obj.data.printers.length||!obj.data.platforms.length)throw Error('Nieprawidłowy plik kopii');if(!confirm('Przywrócenie zastąpi obecną historię i ustawienia. Kontynuować?'))return;db=Object.fromEntries(Object.keys(defaults).map(k=>[k,obj.data[k]]));persist();refreshLists();fillMaterial();fillPrinter();fillPlatform();renderHistory();alert('Kopia przywrócona')}catch(err){alert('Nie udało się wczytać kopii: '+err.message)}finally{e.target.value=''}};
+$('addMaterial').onclick=()=>{const name=$('newMaterial').value.trim(),price=Number($('newMaterialPrice').value);if(!name||!Number.isFinite(price)||price<0)return alert('Podaj nazwę i cenę');db.materials.push({name,price});persist();refreshLists();$('material').value=String(db.materials.length-1);fillMaterial();$('newMaterial').value=''};
+$('addPrinter').onclick=()=>{const name=$('newPrinter').value.trim(),watts=Number($('newWatts').value),dep=Number($('newDep').value);if(!name||![watts,dep].every(x=>Number.isFinite(x)&&x>=0))return alert('Sprawdź dane drukarki');db.printers.push({name,watts,dep});persist();refreshLists();$('printer').value=String(db.printers.length-1);fillPrinter();$('newPrinter').value=''};
+$('addPlatform').onclick=()=>{const name=$('newPlatform').value.trim(),fee=Number($('newFee').value),fixed=Number($('newFixed').value);if(!name||![fee,fixed].every(x=>Number.isFinite(x)&&x>=0)||fee>=100)return alert('Sprawdź dane platformy');db.platforms.push({name,fee,fixed});persist();refreshLists();$('platform').value=String(db.platforms.length-1);fillPlatform();$('newPlatform').value=''};
+$('settings').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;const key=b.dataset.del,i=Number(b.dataset.index);if(db[key].length<=1)return alert('Musi pozostać co najmniej jedna pozycja');if(confirm('Usunąć: '+db[key][i].name+'?')){db[key].splice(i,1);persist();refreshLists();fillMaterial();fillPrinter();fillPlatform()}};
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));document.querySelectorAll('#calc input,#calc select,#calc textarea').forEach(el=>el.addEventListener('input',calculate));$('material').addEventListener('change',fillMaterial);$('printer').addEventListener('change',fillPrinter);$('platform').addEventListener('change',fillPlatform);$('print').onclick=()=>window.print();
+const theme=localStorage.getItem('wycento-theme')||'dark';document.body.classList.toggle('light',theme==='light');$('theme').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('wycento-theme',document.body.classList.contains('light')?'light':'dark')};
+refreshLists();fillMaterial();fillPrinter();fillPlatform();calculate();
+</script></body></html>
